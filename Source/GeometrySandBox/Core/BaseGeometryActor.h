@@ -6,6 +6,32 @@
 #include "GameFramework/Actor.h"
 #include "BaseGeometryActor.generated.h"
 
+UENUM(BlueprintType)
+enum class EMovementType : uint8
+{
+	Sin,
+	Static
+};
+
+USTRUCT(BlueprintType)
+struct FGeometryData
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	EMovementType MoveType = EMovementType::Static;
+
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	float Amplitude = 50.0f;
+
+	UPROPERTY(EditAnywhere, Category="Movement")
+	float Frequency = 5.0f;
+
+	UPROPERTY(EditAnywhere, Category="Design")
+	FLinearColor Color = FLinearColor::Black;
+	
+};
+
 UCLASS()
 class GEOMETRYSANDBOX_API ABaseGeometryActor : public AActor
 {
@@ -15,16 +41,44 @@ public:
 	// Sets default values for this actor's properties
 	ABaseGeometryActor();
 
+	// UPROPERTIES
+	UPROPERTY(VisibleAnywhere)
+	UStaticMeshComponent* BaseMesh;
+	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	
+	// UPROPERTIES
+	// count of weapons that pawn can have
+
+	UPROPERTY(EditAnywhere, Category = "Geometry Data")
+	FGeometryData GeometryData;
+
+	UPROPERTY(EditAnywhere, Category = "Weapon")
+	int32 WeaponsNum = 4;
+
+	UPROPERTY(VisibleAnywhere, Category = "Weapon")
+	int32 AmmoNum = 30;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Stats")
+	float Health = 34.32134f;
+
+	UPROPERTY(EditInstanceOnly, Category = "Stats")
+	bool IsDead = false;
 
 private:
-
-	static void PrintTypes();
-	static void PrintStringTypes();
 	
+	FVector InitialLocation;
+	
+	void HandleMovement();
+	
+	void PrintTypes();
+	void PrintStringTypes();
+	void PrintTransform();
+
+	void SetColor(const FLinearColor& Color);
 };
