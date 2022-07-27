@@ -1,8 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "BaseGeometryActor.h"
+#include "GeometrySandBox/Core/Public/BaseGeometryActor.h"
+
 #include "Materials/MaterialInstanceDynamic.h"
+#include "TimerManager.h"
 
 // Sets default values
 ABaseGeometryActor::ABaseGeometryActor()
@@ -23,6 +25,8 @@ void ABaseGeometryActor::BeginPlay()
 	InitialLocation = GetActorLocation();
 
 	SetColor(GeometryData.Color);
+
+	GetWorldTimerManager().SetTimer(TimerHandle, this, &ABaseGeometryActor::OnTimerFired, GeometryData.TimerRate, true);
 	
 	// Prints
 	//PrintTypes();
@@ -43,15 +47,19 @@ void ABaseGeometryActor::HandleMovement()
 {
 	switch (GeometryData.MoveType)
 	{
-	case EMovementType::Sin:
+		case EMovementType::Sin:
 		{
-			float Time = GetWorld()->GetTimeSeconds();
 			FVector CurrentLocation = GetActorLocation();
-			CurrentLocation.Z = InitialLocation.Z + GeometryData.Amplitude * FMath::Sin(GeometryData.Frequency * Time);
-			SetActorLocation(CurrentLocation);
-			break;
+			if(GetWorld())
+			{
+				float Time = GetWorld()->GetTimeSeconds();
+				CurrentLocation.Z = InitialLocation.Z + GeometryData.Amplitude * FMath::Sin(GeometryData.Frequency * Time);
+				SetActorLocation(CurrentLocation);
+			}
 		}
-	case EMovementType::Static:
+		break;
+		
+		case EMovementType::Static:
 		{
 			break;
 		}
@@ -62,7 +70,7 @@ void ABaseGeometryActor::HandleMovement()
 void ABaseGeometryActor::PrintTypes()
 {
 	UE_LOG(LogTemp, Display, TEXT("Hello Unreal"));
-	
+
 	UE_LOG(LogTemp, Display, TEXT("Weapons Number - %d - %i, Health - %f, is Dead - %d"),
 		WeaponsNum, WeaponsNum, Health, IsDead);
 
@@ -77,9 +85,11 @@ void ABaseGeometryActor::PrintStringTypes()
 	FString StrIsDead = "Is Dead - " + FString(IsDead ? "trueee" : "falseeee");
 
 	FString Stat = FString::Printf(TEXT("All Stat \n %s \n %s \n %s"), *StrWeaponsNum, *StrHealth, *StrIsDead);
-	
-	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, Name,true, FVector2D(1.5f,1.5f));
 
+	if(GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, Name,true, FVector2D(1.5f,1.5f));
+	}
 }
 
 void ABaseGeometryActor::PrintTransform()
@@ -98,9 +108,25 @@ void ABaseGeometryActor::PrintTransform()
 
 void ABaseGeometryActor::SetColor(const FLinearColor& Color)
 {
+	if(!BaseMesh)return;
+	
 	UMaterialInstanceDynamic* DynMaterial = BaseMesh->CreateAndSetMaterialInstanceDynamic(0);
 	if(DynMaterial)
 	{
 		DynMaterial->SetVectorParameterValue("Color", Color);
+	}
+}
+
+void ABaseGeometryActor::OnTimerFired()
+{
+	if (++TimerCount <= MaxTimerCount)
+	{
+		const FLinearColor NewColor = FLinearColor::MakeRandomColor();
+		UE_LOG(LogTemp, Warning, TEXT("Color set up - %s"), *NewColor.ToString());
+		SetColor(NewColor);
+	}
+	else
+	{
+		GetWorldTimerManager().ClearTimer(TimerHandle);
 	}
 }

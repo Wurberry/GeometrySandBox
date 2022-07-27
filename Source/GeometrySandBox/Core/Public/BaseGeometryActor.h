@@ -29,7 +29,9 @@ struct FGeometryData
 
 	UPROPERTY(EditAnywhere, Category="Design")
 	FLinearColor Color = FLinearColor::Black;
-	
+
+	UPROPERTY(EditAnywhere, Category="Design")
+	float TimerRate = 1.0f;
 };
 
 UCLASS()
@@ -48,6 +50,8 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	void SetGeometryData(const FGeometryData& Data) { GeometryData = Data; }
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -73,6 +77,9 @@ protected:
 private:
 	
 	FVector InitialLocation;
+	FTimerHandle TimerHandle;
+	const int32 MaxTimerCount = 5;
+	int32 TimerCount;
 	
 	void HandleMovement();
 	
@@ -81,4 +88,6 @@ private:
 	void PrintTransform();
 
 	void SetColor(const FLinearColor& Color);
+
+	void OnTimerFired();
 };
