@@ -6,6 +6,9 @@
 #include "GameFramework/Actor.h"
 #include "BaseGeometryActor.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnColorChange, const FLinearColor&, Color, const FString&, Name);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnTimerFinished, AActor*);
+
 UENUM(BlueprintType)
 enum class EMovementType : uint8
 {
@@ -18,19 +21,19 @@ struct FGeometryData
 {
 	GENERATED_USTRUCT_BODY()
 
-	UPROPERTY(EditAnywhere, Category = "Movement")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	EMovementType MoveType = EMovementType::Static;
 
-	UPROPERTY(EditAnywhere, Category = "Movement")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	float Amplitude = 50.0f;
 
-	UPROPERTY(EditAnywhere, Category="Movement")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Movement")
 	float Frequency = 5.0f;
 
-	UPROPERTY(EditAnywhere, Category="Design")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Design")
 	FLinearColor Color = FLinearColor::Black;
 
-	UPROPERTY(EditAnywhere, Category="Design")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Design")
 	float TimerRate = 1.0f;
 };
 
@@ -42,19 +45,28 @@ class GEOMETRYSANDBOX_API ABaseGeometryActor : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ABaseGeometryActor();
-
-	// UPROPERTIES
-	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* BaseMesh;
 	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	void SetGeometryData(const FGeometryData& Data) { GeometryData = Data; }
+
+	// UPROPERTIES
+	UPROPERTY(VisibleAnywhere)
+	UStaticMeshComponent* BaseMesh;
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FGeometryData GetGeometryData() const {return GeometryData;}
+
+	UPROPERTY(BlueprintAssignable)
+	FOnColorChange OnColorChange;
+	FOnTimerFinished OnTimerFinished;
 	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	
 	// UPROPERTIES
 	// count of weapons that pawn can have

@@ -50,5 +50,9 @@ private:
 	void FirstLoopGenerator();
 	void SecondLoopGenerator();
 	void ThirdLoopGenerator();
+
+	UFUNCTION()
+	void OnColorChanged(const FLinearColor& Color, const FString& Name);
 	
+	void OnTimerFinished(AActor* Actor);
 };

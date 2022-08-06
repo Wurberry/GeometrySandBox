@@ -34,6 +34,12 @@ void ABaseGeometryActor::BeginPlay()
 	//PrintTransform();
 }
 
+void ABaseGeometryActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	UE_LOG(LogTemp, Warning, TEXT("End life basegeomtryactor"));
+	Super::EndPlay(EndPlayReason);
+}
+
 // Called every frame
 void ABaseGeometryActor::Tick(float DeltaTime)
 {
@@ -124,9 +130,11 @@ void ABaseGeometryActor::OnTimerFired()
 		const FLinearColor NewColor = FLinearColor::MakeRandomColor();
 		UE_LOG(LogTemp, Warning, TEXT("Color set up - %s"), *NewColor.ToString());
 		SetColor(NewColor);
+		OnColorChange.Broadcast(NewColor, GetName());
 	}
 	else
 	{
 		GetWorldTimerManager().ClearTimer(TimerHandle);
+		OnTimerFinished.Broadcast(this);
 	}
 }
