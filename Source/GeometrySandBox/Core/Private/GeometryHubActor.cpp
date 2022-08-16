@@ -1,6 +1,5 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "GeometrySandBox/Core/Public/GeometryHubActor.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogaHubGeometry, All, All);
@@ -16,8 +15,7 @@ AGeometryHubActor::AGeometryHubActor()
 void AGeometryHubActor::BeginPlay()
 {
 	Super::BeginPlay();
-
-	 
+	
 	// FirstLoopGenerator();
 	// SecondLoopGenerator();
 	ThirdLoopGenerator();

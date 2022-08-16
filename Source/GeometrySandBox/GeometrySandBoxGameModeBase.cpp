@@ -3,3 +3,10 @@
 
 #include "GeometrySandBoxGameModeBase.h"
 
+#include "Core/Public/SandBoxPawn.h"
+
+AGeometrySandBoxGameModeBase::AGeometrySandBoxGameModeBase()
+{
+	DefaultPawnClass = ASandBoxPawn::StaticClass();
+	
+}
