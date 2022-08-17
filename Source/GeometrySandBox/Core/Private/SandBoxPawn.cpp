@@ -38,29 +38,44 @@ void ASandBoxPawn::Tick(float DeltaTime)
 	{
 		const FVector NewLocation = GetActorLocation() + Velocity * DeltaTime * VelocityVector;
 		SetActorLocation(NewLocation);
+		VelocityVector = FVector::ZeroVector;
 	}
 	
+}
+
+void ASandBoxPawn::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+	if(!NewController) return;
+	UE_LOG(LogSandBoxPawn, Error, TEXT("%s possessed %s"), *GetName(), *NewController->GetName());
+}
+
+void ASandBoxPawn::UnPossessed()
+{
+	Super::UnPossessed();
+	
+	UE_LOG(LogSandBoxPawn, Error, TEXT("%s Unpossessed"), *GetName());
+
 }
 
 // Called to bind functionality to input
 void ASandBoxPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	PlayerInputComponent->BindAxis("MoveForward", this, &ASandBoxPawn::MoveForward);
-	PlayerInputComponent->BindAxis("MoveRight", this, &ASandBoxPawn::MoveRight);
-	
+	if(PlayerInputComponent)
+	{
+		PlayerInputComponent->BindAxis("MoveForward", this, &ASandBoxPawn::MoveForward);
+		PlayerInputComponent->BindAxis("MoveRight", this, &ASandBoxPawn::MoveRight);
+	}
 }
 
 void ASandBoxPawn::MoveForward(float Amount)
 {
-	UE_LOG(LogSandBoxPawn, Warning, TEXT("Move forward: %f"), Amount);
 	VelocityVector.X = Amount;
 }
 
 void ASandBoxPawn::MoveRight(float Amount)
 {
-	UE_LOG(LogSandBoxPawn, Warning, TEXT("Move right: %f"), Amount);
 	VelocityVector.Y = Amount;
 }
 
